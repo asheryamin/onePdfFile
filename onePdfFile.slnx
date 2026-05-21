@@ -1,0 +1,5 @@
+<Solution>
+  <Folder Name="/Web/">
+    <Project Path="Web/onePdfFile.Web.csproj" />
+  </Folder>
+</Solution>

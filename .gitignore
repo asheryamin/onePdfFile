@@ -1,0 +1,23 @@
+# Build output
+bin/
+obj/
+
+# SQLite database (runtime data — not source)
+*.db
+*.db-shm
+*.db-wal
+
+# User-specific VS files
+*.user
+.vs/
+
+# Rider
+.idea/
+
+# Environment / secrets (never commit real credentials)
+appsettings.*.json
+!appsettings.json
+
+# OS
+Thumbs.db
+.DS_Store

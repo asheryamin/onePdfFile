@@ -1,0 +1,121 @@
+@model onePdfFile.Web.Models.InvoicesViewModel
+@{ ViewData["Title"] = $"חשבוניות — {Model.MonthName} {Model.Year}"; }
+
+@* Month navigator *@
+@{
+    var prev = new DateTime(Model.Year, Model.Month, 1).AddMonths(-1);
+    var next = new DateTime(Model.Year, Model.Month, 1).AddMonths(1);
+    var isCurrentMonth = Model.Year == DateTime.Today.Year && Model.Month == DateTime.Today.Month;
+    var heCulture = new System.Globalization.CultureInfo("he-IL");
+    var prevMonthName = heCulture.DateTimeFormat.GetMonthName(prev.Month);
+    var nextMonthName = heCulture.DateTimeFormat.GetMonthName(next.Month);
+}
+
+<div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
+    <h4 class="mb-0">חשבוניות — @Model.MonthName @Model.Year</h4>
+
+    <div class="d-flex align-items-center gap-2">
+        <a asp-action="Index" asp-route-year="@prev.Year" asp-route-month="@prev.Month"
+           class="btn btn-sm btn-outline-secondary">&#8592; @prevMonthName</a>
+
+        @if (!isCurrentMonth)
+        {
+            <a asp-action="Index" class="btn btn-sm btn-outline-primary">החודש</a>
+        }
+
+        <a asp-action="Index" asp-route-year="@next.Year" asp-route-month="@next.Month"
+           class="btn btn-sm btn-outline-secondary">@nextMonthName &#8594;</a>
+    </div>
+</div>
+
+@if (TempData["Success"] is string ok)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        @ok <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+@if (TempData["Warning"] is string warn)
+{
+    <div class="alert alert-warning alert-dismissible fade show" role="alert">
+        @warn <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+@if (TempData["Error"] is string err)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        @err <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+@* Upload card *@
+<div class="card mb-4">
+    <div class="card-header fw-semibold">העלאת קבצים</div>
+    <div class="card-body">
+        <form asp-action="Upload" method="post" enctype="multipart/form-data">
+            <input type="hidden" name="year" value="@Model.Year" />
+            <input type="hidden" name="month" value="@Model.Month" />
+            <div class="row g-2 align-items-end">
+                <div class="col">
+                    <input type="file" name="files" class="form-control"
+                           multiple accept=".pdf,.png,.jpg,.jpeg,.tif,.tiff,.bmp,.gif,.webp,.svg" />
+                    <div class="form-text">ניתן לבחור מספר קבצים בו-זמנית. פורמטים נתמכים: PDF, PNG, JPG, TIF, BMP, GIF, WebP, SVG.</div>
+                </div>
+                <div class="col-auto">
+                    <button type="submit" class="btn btn-primary">העלה</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+@* Files list *@
+<div class="card mb-4">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <span class="fw-semibold">
+            קבצים (@Model.Files.Count)
+        </span>
+        @if (Model.Files.Count > 0)
+        {
+            <a asp-action="Merge" asp-route-year="@Model.Year" asp-route-month="@Model.Month"
+               class="btn btn-sm btn-success">מזג לקובץ אחד &rarr;</a>
+        }
+    </div>
+
+    @if (Model.Files.Count == 0)
+    {
+        <div class="card-body text-muted text-center py-4">
+            אין קבצים עבור @Model.MonthName @Model.Year. העלה קבצים כדי להתחיל.
+        </div>
+    }
+    else
+    {
+        <ul class="list-group list-group-flush">
+            @foreach (var f in Model.Files)
+            {
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    <div>
+                        <span class="badge bg-secondary me-2">@f.Extension</span>
+                        <span>@f.FileName</span>
+                        <small class="text-muted ms-2">(@FormatBytes(f.SizeBytes))</small>
+                    </div>
+                    <form asp-action="DeleteFile" method="post" class="d-inline"
+                          onsubmit="return confirm('למחוק את הקובץ @f.FileName?')">
+                        <input type="hidden" name="fileName" value="@f.FileName" />
+                        <input type="hidden" name="year" value="@Model.Year" />
+                        <input type="hidden" name="month" value="@Model.Month" />
+                        <button type="submit" class="btn btn-sm btn-outline-danger">מחק</button>
+                    </form>
+                </li>
+            }
+        </ul>
+    }
+</div>
+
+@functions {
+    static string FormatBytes(long bytes) => bytes switch
+    {
+        < 1024 => $"{bytes} B",
+        < 1024 * 1024 => $"{bytes / 1024.0:F1} KB",
+        _ => $"{bytes / (1024.0 * 1024):F1} MB"
+    };
+}

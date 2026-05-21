@@ -1,0 +1,30 @@
+@model onePdfFile.Web.Models.LoginViewModel
+@{ ViewData["Title"] = "כניסה למערכת"; Layout = "~/Views/Shared/_AuthLayout.cshtml"; }
+
+<div class="card shadow-sm">
+    <div class="card-body p-4">
+        <h4 class="card-title text-center mb-4">כניסה למערכת</h4>
+
+        <form asp-action="Login" asp-route-returnUrl="@ViewBag.ReturnUrl" method="post">
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger py-2 small" role="alert"></div>
+
+            <div class="mb-3">
+                <label asp-for="UserName" class="form-label"></label>
+                <input asp-for="UserName" class="form-control" autocomplete="username" autofocus />
+                <span asp-validation-for="UserName" class="text-danger small"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Password" class="form-label"></label>
+                <input asp-for="Password" class="form-control" autocomplete="current-password" />
+                <span asp-validation-for="Password" class="text-danger small"></span>
+            </div>
+
+            <div class="d-grid mt-4">
+                <button type="submit" class="btn btn-primary btn-lg">כניסה</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts { @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); } }

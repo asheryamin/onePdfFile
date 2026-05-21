@@ -1,0 +1,80 @@
+@model List<onePdfFile.Web.Models.CustomerListItem>
+@{ ViewData["Title"] = "ניהול לקוחות"; }
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h3 class="mb-0">לקוחות</h3>
+    <a asp-action="Create" class="btn btn-primary">+ לקוח חדש</a>
+</div>
+
+@if (TempData["Success"] is string ok)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        @ok <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+@if (TempData["Warning"] is string warn)
+{
+    <div class="alert alert-warning alert-dismissible fade show" role="alert">
+        @warn <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+@if (TempData["Error"] is string err)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        @err <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+@if (!Model.Any())
+{
+    <div class="alert alert-info">אין לקוחות במערכת. לחץ על "לקוח חדש" להוספה.</div>
+}
+else
+{
+    <div class="table-responsive">
+        <table class="table table-hover align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th>שם לקוח</th>
+                    <th>שם משתמש</th>
+                    <th>אימייל</th>
+                    <th>סטטוס</th>
+                    <th class="text-center">פעולות</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var c in Model)
+                {
+                    <tr>
+                        <td class="fw-semibold">@c.DisplayName</td>
+                        <td class="text-muted">@c.UserName</td>
+                        <td>@c.Email</td>
+                        <td>
+                            @if (c.IsFirstLogin)
+                            {
+                                <span class="badge bg-warning text-dark">טרם נכנס</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-success">פעיל</span>
+                            }
+                        </td>
+                        <td class="text-center">
+                            <div class="btn-group btn-group-sm">
+                                <a asp-action="Edit" asp-route-id="@c.CustomerId" class="btn btn-outline-secondary">עריכה</a>
+                                <form asp-action="ResetPassword" asp-route-id="@c.CustomerId" method="post" class="d-inline"
+                                      onsubmit="return confirm('לאפס את הסיסמה של @c.DisplayName?')">
+                                    <button type="submit" class="btn btn-outline-warning">איפוס סיסמה</button>
+                                </form>
+                                <form asp-action="Delete" asp-route-id="@c.CustomerId" method="post" class="d-inline"
+                                      onsubmit="return confirm('למחוק את הלקוח @c.DisplayName? פעולה זו אינה ניתנת לביטול.')">
+                                    <button type="submit" class="btn btn-outline-danger">מחיקה</button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}

@@ -1,0 +1,59 @@
+@model onePdfFile.Web.Models.CreateCustomerViewModel
+@{ ViewData["Title"] = "לקוח חדש"; }
+
+<div class="row justify-content-center">
+    <div class="col-md-7">
+        <h3 class="mb-4">הוספת לקוח חדש</h3>
+
+        <form asp-action="Create" method="post">
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger py-2 small" role="alert"></div>
+
+            <div class="card mb-3">
+                <div class="card-header">פרטי לקוח</div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label asp-for="DisplayName" class="form-label"></label>
+                        <input asp-for="DisplayName" class="form-control" />
+                        <span asp-validation-for="DisplayName" class="text-danger small"></span>
+                    </div>
+                    <div class="mb-3">
+                        <label asp-for="UserName" class="form-label"></label>
+                        <input asp-for="UserName" class="form-control" autocomplete="off" />
+                        <span asp-validation-for="UserName" class="text-danger small"></span>
+                    </div>
+                    <div class="mb-0">
+                        <label asp-for="Email" class="form-label"></label>
+                        <input asp-for="Email" class="form-control" type="email" />
+                        <div class="form-text">הסיסמה הזמנית תישלח לכתובת זו.</div>
+                        <span asp-validation-for="Email" class="text-danger small"></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mb-4">
+                <div class="card-header">תיקיות בשרת</div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label asp-for="InvoiceFolder" class="form-label"></label>
+                        <input asp-for="InvoiceFolder" class="form-control" dir="ltr" placeholder="C:\Storage\Customers\CustomerName\Invoices" />
+                        <div class="form-text">תיקייה שבה יישמרו החשבוניות שהלקוח מעלה. תתי-תיקיות חודשיות ייווצרו אוטומטית.</div>
+                        <span asp-validation-for="InvoiceFolder" class="text-danger small"></span>
+                    </div>
+                    <div class="mb-0">
+                        <label asp-for="OutputFolder" class="form-label"></label>
+                        <input asp-for="OutputFolder" class="form-control" dir="ltr" placeholder="C:\Storage\Customers\CustomerName\Output" />
+                        <div class="form-text">תיקייה שבה יישמרו קובצי ה-PDF הממוזגים.</div>
+                        <span asp-validation-for="OutputFolder" class="text-danger small"></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-primary">צור לקוח ושלח סיסמה</button>
+                <a asp-action="Index" class="btn btn-outline-secondary">ביטול</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts { @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); } }

@@ -1,0 +1,76 @@
+@model onePdfFile.Web.Models.MergeRequestViewModel
+@{
+    ViewData["Title"] = "מיזוג קבצים";
+    var allFiles = ViewBag.AllFiles as List<string> ?? [];
+    var hebrewMonth = new System.Globalization.CultureInfo("he-IL").DateTimeFormat.GetMonthName(Model.Month);
+}
+
+<h4 class="mb-4">מיזוג קבצים — @hebrewMonth @Model.Year</h4>
+
+<div class="row">
+    <div class="col-md-8">
+        <form asp-action="Merge" method="post">
+            <input type="hidden" asp-for="Year" />
+            <input type="hidden" asp-for="Month" />
+
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger py-2 small" role="alert"></div>
+
+            <div class="card mb-3">
+                <div class="card-header fw-semibold">בחר קבצים לשילוב</div>
+                <div class="card-body p-0">
+                    <div class="p-2 border-bottom d-flex gap-2">
+                        <button type="button" class="btn btn-sm btn-outline-secondary" id="btnSelectAll">בחר הכל</button>
+                        <button type="button" class="btn btn-sm btn-outline-secondary" id="btnDeselectAll">בטל הכל</button>
+                    </div>
+                    <ul class="list-group list-group-flush" id="fileList">
+                        @for (int i = 0; i < allFiles.Count; i++)
+                        {
+                            var file = allFiles[i];
+                            var ext = System.IO.Path.GetExtension(file).TrimStart('.').ToUpperInvariant();
+                            var isChecked = Model.SelectedFiles.Contains(file);
+                            <li class="list-group-item" data-index="@i">
+                                <div class="form-check">
+                                    <input class="form-check-input file-checkbox" type="checkbox"
+                                           name="SelectedFiles" value="@file"
+                                           id="file_@i" @(isChecked ? "checked" : "") />
+                                    <label class="form-check-label w-100" for="file_@i">
+                                        <span class="badge bg-secondary ms-1">@ext</span>
+                                        @file
+                                    </label>
+                                </div>
+                            </li>
+                        }
+                    </ul>
+                </div>
+            </div>
+
+            <div class="card mb-4">
+                <div class="card-header fw-semibold">שם קובץ הפלט</div>
+                <div class="card-body">
+                    <div class="input-group">
+                        <input asp-for="OutputFileName" class="form-control" />
+                        <span class="input-group-text">.pdf</span>
+                    </div>
+                    <span asp-validation-for="OutputFileName" class="text-danger small"></span>
+                    <div class="form-text">הקובץ יישמר בתיקיית הפלט שהוגדרה עבורך.</div>
+                </div>
+            </div>
+
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-success btn-lg">מזג ושמור</button>
+                <a asp-action="Index" asp-route-year="@Model.Year" asp-route-month="@Model.Month"
+                   class="btn btn-outline-secondary">ביטול</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
+    <script>
+        document.getElementById('btnSelectAll').addEventListener('click', () =>
+            document.querySelectorAll('.file-checkbox').forEach(c => c.checked = true));
+        document.getElementById('btnDeselectAll').addEventListener('click', () =>
+            document.querySelectorAll('.file-checkbox').forEach(c => c.checked = false));
+    </script>
+}
