@@ -18,6 +18,9 @@ obj/
 appsettings.*.json
 !appsettings.json
 
+# Sample / local documents
+doc/
+
 # OS
 Thumbs.db
 .DS_Store
